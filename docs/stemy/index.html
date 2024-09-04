@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Stemy - September 21, 2024</title>
+    <script>
+        let maxVolume = 1;
+
+        const weddingSongs = [
+            {
+                "id": "groomEscorts",
+                "usage": "Wedding - Groom Escorts and Maid of Honor",
+                "title": "Here Comes The Sun - The Beatles",
+                "filePath": "audio/wedding_groomEscorts_long.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=nvOPNysRD-U"
+            },
+            {
+                "id": "brideAisle",
+                "usage": "Wedding - Bride Walks Down Aisle",
+                "title": "A Thousand Years - Christina Perri",
+                "filePath": "audio/wedding_brideAisle.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=DwKQHdsEzd4"
+            },
+            {
+                "id": "wedding_exit",
+                "usage": "Wedding - Wedding Exit",
+                "title": "Beautiful Day - U2",
+                "filePath": "audio/wedding_exit.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=co6WMzDOh1o"
+            }
+        ];
+
+        const receptionSongs = [
+            {
+                "id": "firstDance",
+                "usage": "Reception - Bride/Groom First Dance",
+                "title": "LeAnn Rimes Medley (How Do I Live / I need you)",
+                "filePath": "audio/reception_firstDance.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=HWYJucez43A"
+            },
+            {
+                "id": "fatherDaughterDance",
+                "usage": "Reception - Father/Daughter Dance",
+                "title": "I Hope You Dance (Capo 1) by Chris Stapleton",
+                "filePath": "audio/reception_fatherDaughterDance.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=G-iqeg9-OFM"
+            },
+            {
+                "id": "motherSonDance",
+                "usage": "Reception - Mother/Son Dance",
+                "title": "My Wish - Rascal Flatts",
+                "filePath": "audio/reception_motherSonDance.mp3",
+                "youtubeLink": "https://www.youtube.com/watch?v=NSWTZllisl0"
+            }
+        ];
+
+        let fades = [];
+
+        document.addEventListener('play', function (e) {
+            clearFades();
+            e.target.volume = maxVolume;
+
+            var audios = document.getElementsByTagName('audio');
+            for (var i = 0, len = audios.length; i < len; i++) {
+                if (audios[i] != e.target) {
+                    resetSound(audios[i]);
+                }
+            }
+        }, true);
+
+        function stopAll() {
+            var audios = document.getElementsByTagName('audio');
+            for (var i = 0, len = audios.length; i < len; i++) {
+                resetSound(audios[i]);
+            }
+        }
+
+        function lowerMaxVolume() {
+            maxVolume = Number(Math.max(0.0, maxVolume - fadeIncrement).toPrecision(2));
+            document.getElementById("volumeIndicator").textContent = maxVolume.toPrecision(2);
+        }
+
+        function raiseMaxVolume() {
+            maxVolume = Number(Math.min(1.0, maxVolume + fadeIncrement).toPrecision(2));
+            document.getElementById("volumeIndicator").textContent = maxVolume.toPrecision(2);
+        }
+
+        function resetSound(sound) {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.volume = maxVolume;
+        }
+
+        function clearFades() {
+            fades.forEach(interval => {
+                clearInterval(interval);
+            });
+            fades = [];
+        }
+
+        const fadeIncrement = 0.02;
+
+        function fadeOut(audiosnippetId) {
+            clearFades();
+
+            const sound = document.getElementById(audiosnippetId);
+
+            var fadeAudio = setInterval(function () {
+                if (sound.volume > fadeIncrement) {
+                    sound.volume -= fadeIncrement;
+                }
+                if (sound.volume <= fadeIncrement) {
+                    clearInterval(fadeAudio);
+                    resetSound(sound);
+                }
+            }, 100);
+            fades.push(fadeAudio);
+        }
+
+        function fadeIn(audiosnippetId) {
+            clearFades();
+
+            const sound = document.getElementById(audiosnippetId);
+            sound.volume = 0;
+            sound.currentTime = 0;
+            sound.play();
+
+            var fadeAudio = setInterval(function () {
+                if (sound.volume < maxVolume + fadeIncrement) {
+                    sound.volume = (sound.volume + fadeIncrement) >= 1 ? 1 : sound.volume + fadeIncrement;
+                }
+                if (sound.volume >= maxVolume) {
+                    clearInterval(fadeAudio);
+                }
+            }, 100);
+            fades.push(fadeAudio);
+        }
+    </script>
+    <style>
+        body section {
+            display: flex
+        }
+
+        body section > div {
+            margin: 15px;
+        }
+
+        .song-list .song .title {
+            padding: 10px;
+        }
+
+        .song-list .song .youtubeLink {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Stemy Wedding - September 21, 2024</h1>
+    <button class="stop" type="button" onclick="stopAll()">Stop All</button>
+    <section>
+        <div id="wedding-song-list" class="song-list">
+            <h2>Wedding Songs</h2>
+        </div>
+        <div id="reception-song-list" class="song-list">
+            <h2>Reception Songs</h2>
+        </div>
+        <div>
+            <h2>Reception Spotify playlist</h2>
+            <a href="https://open.spotify.com/playlist/51lDLEyXP4SU1HQAEH2YCz" target="_blank">Top 2000s- 2010s hits
+                clean</a>
+        </div>
+    </section>
+    <div>
+        <h3>Default volume setting</h3>
+        <div>
+            Shouldn't need this - only use if the default audio is too high.
+        </div>
+        <button class="stop" type="button" onclick="lowerMaxVolume()">Increase Max (-)</button>
+        Max/Default Volume: <span id="volumeIndicator">maxVolume</span>
+        <button class="stop" type="button" onclick="raiseMaxVolume()">Increase Max (+)</button>
+    </div>
+
+    <!-- No volume control, may be limited to previews as well. Link is probably best given usage/complexity/eardrums -->
+    <!-- <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/51lDLEyXP4SU1HQAEH2YCz?theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> -->
+    <!-- <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/51lDLEyXP4SU1HQAEH2YCz?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> -->
+</body>
+
+<template id="song-template">
+    <div class="song">
+        <h3 class="usage">usage</h3>
+        <div class="title">
+            title
+        </div>
+        <button class="fadeIn" type="button">Fade In</button>
+        <audio controls preload="auto">
+            <source src="audio/wedding_firstDance.mp3" type="audio/mp3" />
+        </audio>
+        <button class="fadeOut" type="button">Fade Out</button>
+        <div class="youtubeLink">
+            <a href="https://www.youtube.com/watch?v=HWYJucez43A" target="_blank">Youtube</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    if ("content" in document.createElement("template")) {
+        // Instantiate the table with the existing HTML tbody
+        // and the row with the template
+        const template = document.querySelector("#song-template");
+
+        const weddingSongList = document.querySelector("#wedding-song-list");
+        weddingSongs.forEach(song => {
+            const clone = template.content.cloneNode(true);
+            clone.querySelector(".usage").textContent = song.usage;
+            clone.querySelector(".title").textContent = song.title;
+            clone.querySelector(".fadeIn").onclick = function () { fadeIn(song.id); };
+            clone.querySelector(".fadeOut").onclick = function () { fadeOut(song.id); };
+            clone.querySelector("audio").id = song.id;
+            clone.querySelector("audio source").src = song.filePath;
+            clone.querySelector(".youtubeLink a").href = song.youtubeLink;
+
+            weddingSongList.appendChild(clone);
+        });
+
+        const receptionSongList = document.querySelector("#reception-song-list");
+        receptionSongs.forEach(song => {
+            const clone = template.content.cloneNode(true);
+            clone.querySelector(".usage").textContent = song.usage;
+            clone.querySelector(".title").textContent = song.title;
+            clone.querySelector(".fadeIn").onclick = function () { fadeIn(song.id); };
+            clone.querySelector(".fadeOut").onclick = function () { fadeOut(song.id); };
+            clone.querySelector("audio").id = song.id;
+            clone.querySelector("audio source").src = song.filePath;
+            clone.querySelector(".youtubeLink a").href = song.youtubeLink;
+
+            receptionSongList.appendChild(clone);
+        });
+    }
+    else {
+        console.error("NOOO!!! - templates not supported")
+    }
+
+    document.getElementById("volumeIndicator").textContent = maxVolume.toPrecision(2);
+</script>
+
+</html>
